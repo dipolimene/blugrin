@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-deployment
+  labels:
+    app: tomcat
+    color: green
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tomcat
+      color: green
+  template:
+    metadata:
+      labels:
+        app: tomcat
+        color: green
+    spec:
+      containers:
+      - name: tomcat-container
+        image: tomcat
+        ports:
+        - containerPort: 8080

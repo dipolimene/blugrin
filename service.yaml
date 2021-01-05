@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: blue-green-service
+  labels:
+    app: APP
+    color: COLOR
+    env: prod
+spec:
+  type: LoadBalancer
+  selector:
+    app: APP
+    color: COLOR
+  ports:
+    - port: 80
+      targetPort: PORT

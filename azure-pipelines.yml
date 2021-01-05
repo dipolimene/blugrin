@@ -1,0 +1,60 @@
+stages:
+- stage: Buildagent
+  displayName: Intialize buid agent
+  jobs:
+  - job: Build
+    displayName: Build job
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    
+    - task: KubernetesManifest@0
+      displayName: Blue deployment
+      inputs:
+        action: 'deploy'
+        kubernetesServiceConnection: 'aks-halo-mvct-blue-green'
+        namespace: 'blue-green'
+        manifests: 'deployment-blue.yaml'
+    
+    - task: KubernetesManifest@0
+      displayName: Blue service deployment
+      inputs:
+        action: 'deploy'
+        kubernetesServiceConnection: 'aks-halo-mvct-blue-green'
+        namespace: 'blue-green'
+        manifests: 'service-blue.yaml'
+    
+    - task: KubernetesManifest@0
+      displayName: Green deployment
+      inputs:
+        action: 'deploy'
+        kubernetesServiceConnection: 'aks-halo-mvct-blue-green'
+        namespace: 'blue-green'
+        manifests: 'deployment-green.yaml'
+    
+    - task: KubernetesManifest@0
+      displayName: Green service
+      inputs:
+        action: 'deploy'
+        kubernetesServiceConnection: 'aks-halo-mvct-blue-green'
+        namespace: 'blue-green'
+        manifests: 'service-green.yaml'
+    
+    - task: CmdLine@2
+      inputs:
+        script: |
+          export COLOR=${COLOR}
+          export APP=${APP}
+          export PORT=${PORT}
+          sed -i 's/APP/$(APP)/g' service.yaml
+          sed -i 's/COLOR/$(COLOR)/g' service.yaml
+          sed -i 's/PORT/$(PORT)/g' service.yaml
+      
+    - task: KubernetesManifest@0
+      inputs:
+        action: 'deploy'
+        kubernetesServiceConnection: 'aks-halo-mvct-blue-green'
+        namespace: 'blue-green'
+        manifests: 'service.yaml'
+        
+
